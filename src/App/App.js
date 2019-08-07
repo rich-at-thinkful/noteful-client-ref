@@ -5,6 +5,8 @@ import NoteListNav from '../NoteListNav/NoteListNav';
 import NotePageNav from '../NotePageNav/NotePageNav';
 import NoteListMain from '../NoteListMain/NoteListMain';
 import NotePageMain from '../NotePageMain/NotePageMain';
+import AddFolder from '../AddFolder/AddFolder';
+import AddNote from '../AddNote/AddNote';
 import ApiContext from '../ApiContext';
 import config from '../config';
 import './App.css';
@@ -42,6 +44,49 @@ class App extends Component {
         });
     };
 
+    handleAddFolder = (folderName) => {
+        return fetch(`${config.API_ENDPOINT}/folders`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify({ name: folderName }),
+        })
+            .then(res => {
+                if (!res.ok) 
+                    return res.json().then(e => Promise.reject(e));
+                    else return res.json();
+            })
+            .then(folder => {
+                this.setState({
+                    folders: [ ...this.state.folders, folder ]
+                });
+                return folder;
+            })
+    };
+
+    handleAddNote = (note) => {
+        note.modified = new Date().toISOString();
+        return fetch(`${config.API_ENDPOINT}/notes`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify(note)
+        })
+            .then(res => {
+                if (!res.ok)
+                return res.json().then(e => Promise.reject(e));
+                else return res.json();
+            })
+            .then(note => {
+                this.setState({
+                    notes: [ ...this.state.notes, note ]
+                });
+                return note;
+            });
+    };
+
     renderNavRoutes() {
         return (
             <>
@@ -72,6 +117,8 @@ class App extends Component {
                     />
                 ))}
                 <Route path="/note/:noteId" component={NotePageMain} />
+                <Route path="/add-folder" component={AddFolder} />
+                <Route path="/add-note" component={AddNote} />
             </>
         );
     }
@@ -80,7 +127,9 @@ class App extends Component {
         const value = {
             notes: this.state.notes,
             folders: this.state.folders,
-            deleteNote: this.handleDeleteNote
+            deleteNote: this.handleDeleteNote,
+            addFolder: this.handleAddFolder,
+            addNote: this.handleAddNote,
         };
         return (
             <ApiContext.Provider value={value}>

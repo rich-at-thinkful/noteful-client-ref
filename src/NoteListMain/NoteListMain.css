@@ -5,6 +5,12 @@
   padding: 10px;
 }
 
+.NoteListMain p {
+  color: white;
+  font-size: 1.1em;
+  margin-left: 10px;
+}
+
 .NoteListMain__button-container {
   max-width: 380px;
   margin: 0 10px;
